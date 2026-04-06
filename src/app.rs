@@ -73,22 +73,13 @@ impl App {
     pub fn update(&mut self, msg: Message) -> Option<Message> {
         match msg {
             Message::SelectPrev => {
-                self.list_state.select_previous();
+                self.select_previous();
             }
             Message::SelectNext => {
-                self.list_state.select_next();
+                self.select_next();
             }
             Message::Delete => {
-                if let Some(index) = self.list_state.selected()
-                    && index < self.todos.len()
-                {
-                    self.todos.remove(index);
-                    if self.todos.is_empty() {
-                        self.list_state.select(None);
-                    } else if index >= self.todos.len() {
-                        self.list_state.select(Some(self.todos.len() - 1));
-                    }
-                }
+                self.delete();
             }
             Message::Quit => {
                 self.running_state = RunningState::Done;
@@ -111,6 +102,39 @@ impl App {
             KeyCode::Char('q') => Some(Message::Quit),
             KeyCode::Char('D') => Some(Message::Delete),
             _ => None,
+        }
+    }
+
+    fn select_previous(&mut self) {
+        if let Some(index) = self.list_state.selected()
+            && index > 0
+        {
+            self.list_state.select_previous();
+        } else {
+            self.list_state.select(Some(self.todos.len() - 1));
+        }
+    }
+
+    fn select_next(&mut self) {
+        if let Some(index) = self.list_state.selected()
+            && index == self.todos.len() - 1
+        {
+            self.list_state.select(Some(0));
+        } else {
+            self.list_state.select_next();
+        }
+    }
+
+    fn delete(&mut self) {
+        if let Some(index) = self.list_state.selected()
+            && index < self.todos.len()
+        {
+            self.todos.remove(index);
+            if self.todos.is_empty() {
+                self.list_state.select(None);
+            } else if index >= self.todos.len() {
+                self.list_state.select(Some(self.todos.len() - 1));
+            }
         }
     }
 }

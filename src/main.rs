@@ -7,7 +7,7 @@ use color_eyre::eyre::Result;
 
 use crate::{
     app::{App, RunningState},
-    ui::render_ui,
+    ui::render,
 };
 
 fn main() -> Result<()> {
@@ -18,7 +18,7 @@ fn main() -> Result<()> {
 
     while app.running_state != RunningState::Done {
         // Render the tui
-        terminal.draw(|frame| render_ui(frame, &mut app))?;
+        terminal.draw(|frame| render(frame, &mut app))?;
 
         // Handle events and map to a Message
         let mut current_message = App::handle_event()?;
