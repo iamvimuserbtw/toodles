@@ -5,7 +5,7 @@ pub enum TodoState {
     Done,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TodoItem {
     pub title: String,
     pub description: String,

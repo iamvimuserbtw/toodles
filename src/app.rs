@@ -70,16 +70,6 @@ impl App {
         Ok(None)
     }
 
-    fn handle_key(key: event::KeyEvent) -> Option<Message> {
-        match key.code {
-            KeyCode::Char('j') => Some(Message::SelectNext),
-            KeyCode::Char('k') => Some(Message::SelectPrev),
-            KeyCode::Char('q') => Some(Message::Quit),
-            KeyCode::Char('D') => Some(Message::Delete),
-            _ => None,
-        }
-    }
-
     pub fn update(&mut self, msg: Message) -> Option<Message> {
         match msg {
             Message::SelectPrev => {
@@ -89,8 +79,15 @@ impl App {
                 self.list_state.select_next();
             }
             Message::Delete => {
-                if let Some(index) = self.list_state.selected() {
+                if let Some(index) = self.list_state.selected()
+                    && index < self.todos.len()
+                {
                     self.todos.remove(index);
+                    if self.todos.is_empty() {
+                        self.list_state.select(None);
+                    } else if index >= self.todos.len() {
+                        self.list_state.select(Some(self.todos.len() - 1));
+                    }
                 }
             }
             Message::Quit => {
@@ -99,5 +96,21 @@ impl App {
             _ => todo!(),
         };
         None
+    }
+
+    pub fn selected_todo(&self) -> Option<&TodoItem> {
+        self.list_state
+            .selected()
+            .and_then(|index| self.todos.get(index))
+    }
+
+    fn handle_key(key: event::KeyEvent) -> Option<Message> {
+        match key.code {
+            KeyCode::Char('j') => Some(Message::SelectNext),
+            KeyCode::Char('k') => Some(Message::SelectPrev),
+            KeyCode::Char('q') => Some(Message::Quit),
+            KeyCode::Char('D') => Some(Message::Delete),
+            _ => None,
+        }
     }
 }
